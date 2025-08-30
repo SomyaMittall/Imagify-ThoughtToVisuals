@@ -5,7 +5,7 @@ import { AppContext } from '../context/AppContext'
 
 const Navbar = () => {
 
-    const { user, setShowLogin } = useContext(AppContext)
+    const { user, setShowLogin, logout, credit } = useContext(AppContext)
     const navigate = useNavigate();
 
     return (
@@ -13,10 +13,10 @@ const Navbar = () => {
 
             {/* Logo */}
             <Link to='/'>
-                <div className="p-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 shadow-lg">
-                    <img src={assets.logo} alt="" className="w-28 sm:w-32 lg:w-40" />
-                </div>
-            </Link>
+  <div className="p-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 shadow-lg">
+    <img src={assets.logo} alt="" className="w-28 sm:w-32 lg:w-40 brightness-0 invert" />
+  </div>
+</Link>
 
             <div>
                 {user ? (
@@ -27,12 +27,12 @@ const Navbar = () => {
                             onClick={() => navigate("/buy")}
                             className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-purple-600 px-4 sm:px-6 py-1.5 rounded-full shadow-lg shadow-purple-800/50 hover:scale-105 transition-transform duration-500"
                         >
-                            <img className="w-5" src={assets.credit_star} alt="" />
-                            <p className="text-xs sm:text-sm font-semibold">Credits left : 50</p>
+                            <img className="w-5 brightness-0 invert" src={assets.credit_star} alt="" />
+                            <p className="text-xs sm:text-sm font-semibold ">Credits left : {credit}</p>
                         </button>
 
                         {/* Greeting */}
-                        <p className="max-sm:hidden pl-2 font-medium text-gray-300">Hi, Dear</p>
+                        <p className="max-sm:hidden pl-2 font-medium text-gray-300">Hi, {user.name}</p>
 
                         {/* Profile */}
                         <div className="relative group">
@@ -41,7 +41,7 @@ const Navbar = () => {
                             {/* Dropdown */}
                             <div className="absolute hidden group-hover:block top-12 right-0 z-10">
                                 <ul className="list-none bg-[#1e293b] border border-purple-700 rounded-lg shadow-lg text-sm text-gray-200">
-                                    <li className="py-2 px-4 cursor-pointer hover:bg-purple-700/30 transition">Logout</li>
+                                    <li onClick={logout} className="py-2 px-4 cursor-pointer hover:bg-purple-700/30 transition">Logout</li>
                                 </ul>
                             </div>
                         </div>
@@ -54,7 +54,7 @@ const Navbar = () => {
                         >
                             Pricing
                         </p>
-                        <button onClick={()=>setShowLogin(true)} className="bg-gradient-to-r from-purple-600 to-blue-500 hover:from-blue-500 hover:to-purple-600 text-white py-2 px-7 sm:px-10 text-sm rounded-full shadow-md shadow-blue-900/40 transition-transform hover:scale-105">
+                        <button onClick={() => setShowLogin(true)} className="bg-gradient-to-r from-purple-600 to-blue-500 hover:from-blue-500 hover:to-purple-600 text-white py-2 px-7 sm:px-10 text-sm rounded-full shadow-md shadow-blue-900/40 transition-transform hover:scale-105">
                             Login
                         </button>
                     </div>

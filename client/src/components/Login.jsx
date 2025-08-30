@@ -1,65 +1,53 @@
-// import React, { useContext, useEffect, useState } from 'react'
-// import { assets } from '../assets/assets'
-// import { AppContext } from '../context/AppContext'
-
-// const Login = () => {
-
-//     const [state, setState] = useState("Login")
-//     const {setShowLogin } = useContext(AppContext)
-
-//     useEffect(() => {
-//         document.body.style.overflow = "hidden";
-//         return () => {
-//             document.body.style.overflow = "unset";
-//         }
-
-//     },[])
-
-//     return (
-//         <div className='fixed inset-0 z-[9999] backdrop-blur-sm bg-black/30 flex justify-center items-center'>
-
-//             <form className='relative bg-white p-10 rounded-xl text-slate-500 '>
-
-//                 <h1 className='text-center text-2xl text-neutral-700 font-medium'>{state}</h1>
-//                 <p className='text-sm'>Welcome back! Please sign in to continue</p>
-
-//                 {state !== "Login" && <div className='border px-6 py-2 flex items-center gap-2 rounded-full mt-5'>
-//                     <img src={assets.user} alt="" />
-//                     <input type="text" className='outline-none text-sm' placeholder='Full Nme' required />
-//                 </div>}
-
-//                 <div className='border px-6 py-2 flex items-center gap-2 rounded-full mt-4'>
-//                     <img src={assets.email_icon} alt="" />
-//                     <input type="email" className='outline-none text-sm' placeholder='Email Id' required />
-//                 </div>
-
-//                 <div className='border px-6 py-2 flex items-center gap-2 rounded-full mt-4'>
-//                     <img src={assets.lock_icon} alt="" />
-//                     <input type="password" className='outline-none text-sm' placeholder='Password' required />
-//                 </div>
-
-//                 <p className='text-sm text-blue-600 my-4 cursor-pointer'>Forgot Password?</p>
-
-//                 <button className='bg-blue-600 w-full text-white py-2 rounded-full'>Create account</button>
-
-//                 {state === "Login" ? <p className='mt-5 text-center'>Don't have an account? <span className='text-blue-600 cursor-pointer' onClick={() => setState("Sign Up")}>Sign Up</span></p>
-//                     :
-//                     <p className='mt-5 text-5 text-center'>Already have an account? <span className='text-blue-600 cursor-pointer' onClick={() => setState("Login")}>Login</span></p>}
-
-//                 <img onClick={()=>setShowLogin(false)} src={assets.cross_icon} alt="" className='absolute top-5 right-5 cursor-pointer' />
-//             </form>
-//         </div>
-//     )
-// }
-
-// export default Login
 import React, { useContext, useEffect, useState } from "react";
 import { assets } from "../assets/assets";
 import { AppContext } from "../context/AppContext";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const Login = () => {
+
   const [state, setState] = useState("Login");
-  const { setShowLogin } = useContext(AppContext);
+  const { setShowLogin, backendUrl, setToken, setUser } = useContext(AppContext);
+
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const onSubmitHandler = async (e) => {
+    e.preventDefault();
+
+    try {
+      if (state === "Login") {
+        const { data } = await axios.post(backendUrl + "/api/user/login", { email, password })
+
+        if (data.success) {
+          setToken(data.token)
+          setUser(data.user)
+          localStorage.setItem("token", data.token)
+          setShowLogin(false)
+
+        } else {
+          toast.error(data.message)
+        }
+      } else {
+        const { data } = await axios.post(backendUrl + "/api/user/register", { name, email, password })
+
+        if (data.success) {
+          setToken(data.token)
+          setUser(data.user)
+          localStorage.setItem("token", data.token)
+          setShowLogin(false)
+
+        } else {
+          toast.error(data.message)
+        }
+      }
+
+    } catch (error) {
+      toast.error(error.message)
+    }
+
+  };
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -70,7 +58,7 @@ const Login = () => {
 
   return (
     <div className="fixed inset-0 z-[9999] backdrop-blur-md bg-black/60 flex justify-center items-center">
-      <form
+      <form onSubmit={onSubmitHandler}
         className="relative w-[90%] max-w-md p-10 rounded-2xl text-slate-200 
                    bg-black/70 border border-gradient-to-r from-purple-500 to-blue-500
                    shadow-xl shadow-black/50"
@@ -86,8 +74,8 @@ const Login = () => {
         {/* Full Name (only for Sign Up) */}
         {state !== "Login" && (
           <div className="mt-6 border border-gray-600/40 bg-gray-800/40 px-6 py-3 flex items-center gap-3 rounded-full focus-within:border-purple-500/70 transition">
-            <img src={assets.user} alt="" className="w-5 h-5 opacity-80" />
-            <input
+            <img src={assets.user_icon} alt="" className="w-5 h-5 opacity-80" />
+            <input onChange={e => setName(e.target.value)} value={name}
               type="text"
               className="bg-transparent flex-1 outline-none text-sm text-white placeholder-gray-400"
               placeholder="Full Name"
@@ -99,7 +87,7 @@ const Login = () => {
         {/* Email */}
         <div className="mt-4 border border-gray-600/40 bg-gray-800/40 px-6 py-3 flex items-center gap-3 rounded-full focus-within:border-purple-500/70 transition">
           <img src={assets.email_icon} alt="" className="w-5 h-5 opacity-80" />
-          <input
+          <input onChange={e => setEmail(e.target.value)} value={email}
             type="email"
             className="bg-transparent flex-1 outline-none text-sm text-white placeholder-gray-400"
             placeholder="Email Id"
@@ -110,7 +98,7 @@ const Login = () => {
         {/* Password */}
         <div className="mt-4 border border-gray-600/40 bg-gray-800/40 px-6 py-3 flex items-center gap-3 rounded-full focus-within:border-purple-500/70 transition">
           <img src={assets.lock_icon} alt="" className="w-5 h-5 opacity-80" />
-          <input
+          <input onChange={e => setPassword(e.target.value)} value={password}
             type="password"
             className="bg-transparent flex-1 outline-none text-sm text-white placeholder-gray-400"
             placeholder="Password"
